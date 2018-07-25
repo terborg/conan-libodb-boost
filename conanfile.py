@@ -22,6 +22,14 @@ class LibODBBoostConan( ConanFile ):
         return os.path.join( self.source_folder, self.name + '-' + self.version )
 
     def build( self ):
+
+        #
+        # Here, we remove the stdlib c++, because it can not be found by the configure script
+        # for Android. If not removed, configure does not pass the part where it is checking
+        # which thread model to use
+        #
+        if tools.cross_building( self.settings ):
+            del self.settings.compiler.libcxx
         
         env_build = AutoToolsBuildEnvironment(self)
         env_build.fpic = self.options.fPIC
@@ -36,7 +44,9 @@ class LibODBBoostConan( ConanFile ):
     def package(self):
         
         self.copy( "*.hxx", dst="include/odb", src= os.path.join( self.source_path(), "odb" )  )
+        
         self.copy( "*.a", dst="lib", keep_path=False )
+        self.copy( "*.h", dst="include", keep_path=True )
 
     def package_info(self):
         self.cpp_info.libs = ["odb-boost"]
