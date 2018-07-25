@@ -23,12 +23,7 @@ class LibODBBoostConan( ConanFile ):
 
     def build( self ):
 
-        #
-        # Here, we remove the stdlib c++, because it can not be found by the configure script
-        # for Android. If not removed, configure does not pass the part where it is checking
-        # which thread model to use
-        #
-        if tools.cross_building( self.settings ):
+        if self.settings.os == "Android" and self.settings.compiler == "clang":
             del self.settings.compiler.libcxx
         
         env_build = AutoToolsBuildEnvironment(self)
